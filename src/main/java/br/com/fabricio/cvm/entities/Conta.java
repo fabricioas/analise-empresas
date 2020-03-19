@@ -1,4 +1,4 @@
-package br.com.fabricio.cvm;
+package br.com.fabricio.cvm.entities;
 
 import java.math.BigDecimal;
 

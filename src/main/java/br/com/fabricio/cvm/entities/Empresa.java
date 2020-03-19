@@ -1,4 +1,4 @@
-package br.com.fabricio.cvm;
+package br.com.fabricio.cvm.entities;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class Empresa {
 	private String dtRecebimento;
 	private String linkDocumento;
 	private List<Demonstrativo> demonstrativos = new LinkedList<>();
-	
+
 	public Empresa(String... csv) {
 		super();
 		this.cnpj = csv[0];
@@ -26,10 +26,6 @@ public class Empresa {
 		this.idDocumento = csv[6];
 		this.dtRecebimento = csv[7];
 		this.linkDocumento = csv[8];
-	}
-
-	public Empresa() {
-		super();
 	}
 
 	public String getCnpj() {
@@ -103,7 +99,6 @@ public class Empresa {
 	public void setLinkDocumento(String linkDocumento) {
 		this.linkDocumento = linkDocumento;
 	}
-	
 
 	public List<Demonstrativo> getDemonstrativos() {
 		return demonstrativos;
@@ -113,10 +108,7 @@ public class Empresa {
 		this.demonstrativos = demonstrativos;
 	}
 
-	@Override
-	public String toString() {
-		return "Empresa [cnpj=" + cnpj + " dtReferencia=" + dtReferencia + " versao=" + versao + " nome=" + nome
-				+ " codigoCvm=" + codigoCvm + " tipoDocumento=" + tipoDocumento + " idDocumento=" + idDocumento
-				+ " dtRecebimento=" + dtRecebimento + " linkDocumento=" + linkDocumento + "]";
+	public void addDemostrativo(Demonstrativo demonstrativo) {
+		this.demonstrativos.add(demonstrativo);
 	}
 }

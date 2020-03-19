@@ -9,13 +9,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import br.com.fabricio.cvm.entities.ChaveDemonstrativo;
+import br.com.fabricio.cvm.entities.Conta;
+import br.com.fabricio.cvm.entities.Demonstrativo;
+import br.com.fabricio.cvm.entities.Empresa;
+import br.com.fabricio.cvm.entities.LancamentoDRE;
+import br.com.fabricio.cvm.repositories.EmpresaRepositorio;
+
 public class LeituraArquivos {
-	private Repositorio repositorio = new Repositorio();
-	
+	private EmpresaRepositorio repositorio = new EmpresaRepositorio(null);
+
 	public static void main(String[] args) throws Exception {
 		LeituraArquivos leituraArquivos = new LeituraArquivos();
 		leituraArquivos.arquivoEmpresa();
-		leituraArquivos.arquivoDRE(); 
+		leituraArquivos.arquivoDRE();
 	}
 
 	private void arquivoEmpresa() throws IOException {
@@ -26,9 +33,7 @@ public class LeituraArquivos {
 
 		Map<String, Empresa> empresas = linhas.stream().map(s -> s.split(";")).filter(p -> !p[0].equals("CNPJ_CIA"))
 				.map(Empresa::new)
-				.collect(
-						Collectors.groupingBy(Empresa::getCnpj, 
-						Collectors.reducing(null, this::maxEmpresa)));
+				.collect(Collectors.groupingBy(Empresa::getCnpj, Collectors.reducing(null, this::maxEmpresa)));
 		repositorio.setEmpresas(empresas);
 		System.out.println(empresas.size());
 	}
@@ -42,52 +47,64 @@ public class LeituraArquivos {
 		Map<Integer, LancamentoDRE> lancamentos = linhas.stream().map(s -> s.split(";"))
 				.filter(p -> !p[0].equals("CNPJ_CIA")).map(LancamentoDRE::new)
 				.collect(Collectors.groupingBy(LancamentoDRE::getKey, Collectors.reducing(null, this::maxDRE)));
-		System.out.println("Qtd Lancamento ->"+lancamentos.size());
+		System.out.println("Qtd Lancamento ->" + lancamentos.size());
 
 		processaLancamentos(lancamentos);
 
-		report();
-		
+//		report();
+
 	}
 
-	private void report() {
-		System.out.println("========Report=======");
-		repositorio.getEmpresas().forEach((k,v) -> {
-			if( v.getDemonstrativos().isEmpty() ) {
-				System.out.print(k);
-				System.out.print("===>");
-				System.out.print(v.getDemonstrativos().size());
-				System.out.println();
-			}else {
-				System.out.print(v.getCnpj());
-				System.out.print( " - ");
-				System.out.println( v.getNome());
-				v.getDemonstrativos().forEach(d -> {
-					System.out.print("===>");
-					System.out.print(d.getNumeroTrimestre());
-					System.out.print( "-" );
-					System.out.print(d.getAno());
-					System.out.print(" = ");
-					System.out.print(d.getContas().size());
-					System.out.println();
-				});
-			}
-		});
-	}
+//	private void report() {
+//		PrintStream out;
+//		try {
+//			out = new PrintStream("./output.txt");
+//
+//			out.println("========Report=======");
+//			repositorio.getEmpresas().forEach((k, v) -> {
+//				if (v.getDemonstrativos().isEmpty()) {
+//					out.println(k);
+//					out.println("===>No report<====");
+//				} else {
+//					out.print(v.getCnpj());
+//					out.print(" - ");
+//					out.println(v.getNome());
+//					v.getDemonstrativos().forEach(d -> {
+//						out.print("===> ");
+//						out.print(d.getNumeroTrimestre());
+//						out.print("-");
+//						out.print(d.getAno());
+//						out.println(" <=== ");
+//						d.getContas().stream().sorted((c1, c2) -> c1.getCodigoConta().compareTo(c2.getCodigoConta()))
+//								.forEach(c -> {
+//									String linha = StringUtils
+//											.rightPad(c.getCodigoConta() + " - " + c.getDescricaoConta(), 80, '-');
+//									out.print(linha + "  ");
+//									out.println(new DecimalFormat("#,###,##0.00").format(c.getVlConta()));
+//								});
+//						out.println();
+//					});
+//				}
+//			});
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 
 	private void processaLancamentos(Map<Integer, LancamentoDRE> lancamentos) {
-		lancamentos.values().stream()
-				.collect(Collectors.groupingBy(ChaveDemonstrativo::new))
+		lancamentos.values().stream().collect(Collectors.groupingBy(ChaveDemonstrativo::new))
 				.forEach(this::processaEmpresa);
 	}
-	
+
 	private void processaEmpresa(ChaveDemonstrativo k, List<LancamentoDRE> v) {
-		Demonstrativo demonstrativo = v.stream().map( Conta::new ).reduce(new Demonstrativo(), this::addConta, (d, c) -> c ); 
-		v.stream().findFirst().ifPresent( c -> preencheDemosntrativo(demonstrativo,c));
+		Demonstrativo demonstrativo = v.stream().map(Conta::new).reduce(new Demonstrativo(), this::addConta,
+				(d, c) -> c);
+		v.stream().findFirst().ifPresent(c -> preencheDemosntrativo(demonstrativo, c));
 		Empresa empresa = repositorio.findEmpresa(k.getCnpj());
 		empresa.getDemonstrativos().add(demonstrativo);
 	}
-	
+
 	private Demonstrativo addConta(Demonstrativo d, Conta c) {
 		d.getContas().add(c);
 		return d;
@@ -97,13 +114,13 @@ public class LeituraArquivos {
 		dre.setNome(lancamento.getGrupoDfp());
 		dre.setCnpj(lancamento.getCnpj());
 		dre.setDataInicio(LocalDate.parse(lancamento.getDtInicioExercicio()));
-		dre.setDataFim (LocalDate.parse(lancamento.getDtFimExercicio()));
+		dre.setDataFim(LocalDate.parse(lancamento.getDtFimExercicio()));
 		dre.setDataReferencia(LocalDate.parse(lancamento.getDtReferencia()));
 		dre.setNumeroTrimestre(lancamento.getTrimestre());
 		dre.setAno(lancamento.getAno());
-			
+
 	}
-	
+
 	private LancamentoDRE maxDRE(LancamentoDRE a, LancamentoDRE b) {
 		if (a == null) {
 			return b;
