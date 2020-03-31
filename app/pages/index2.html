@@ -1,0 +1,23 @@
+<html lang="en" ng-app="app">
+<head>
+<meta charset="utf-8">
+<title>My HTML File</title>
+<script src="./data/covid_deaths.js"></script>
+<script src="../lib/angular/angular.js"></script>
+<script src="../lib/chart/Chart.js"></script>
+<script src="../lib/angular/angular-chart.js"></script>
+<script src="index2.js"></script>
+<link href="../lib/chart/Chart.css">
+</head>
+<body ng-controller="Empresa">
+	<ul>
+		<li ng-repeat="phone in phones"><span>{{phone.name}}</span>
+			<p>{{phone.snippet}}</p></li>
+	</ul>
+
+	<canvas id="line" class="chart chart-line" chart-data="data"
+		chart-labels="labels" chart-series="series" chart-options="options"
+		chart-dataset-override="datasetOverride" chart-click="onClick">
+	</canvas>
+</body>
+</html>

@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import br.com.fabricio.cvm.entities.Empresa;
+import br.com.fabricio.cvm.js.EmpresasPageService;
 import br.com.fabricio.cvm.processamento.DREProcessor;
 import br.com.fabricio.cvm.processamento.EmpresaProcessor;
 
@@ -33,6 +34,7 @@ public class Run {
 				 arquivos.put(a.getName(), a);
 			});
 		}
+
 		Map<String, Empresa> empresas = new HashMap<>();
 		for (Integer ano = 2010; ano <= LocalDate.now().getYear(); ano++) {
 			ArquivoInfo arquivoEmpresa = arquivos.get("itr_cia_aberta_"+ano+".csv");
@@ -51,6 +53,13 @@ public class Run {
 			System.out.println(empresas.values().stream().filter( p -> p.getDemonstrativos().size() > 0 ).count());
 
 		}
+		EmpresasPageService empresaService = new EmpresasPageService();
+		empresaService.begin();
+		empresas.forEach( (k, v) -> {
+			empresaService.save(v);
+		});
+		empresaService.end();
+		
 		report(empresas);
 	}
 
