@@ -1,0 +1,19 @@
+<html lang="en" ng-app="app">
+<head>
+<meta charset="utf-8">
+<title>Analise Empresas</title>
+<script src="../lib/angular/angular.js"></script>
+<script src="../lib/chart/Chart.js"></script>
+<script src="../lib/angular/angular-chart.js"></script>
+<script src="index2.js"></script>
+<link href="../lib/chart/Chart.css">
+</head>
+<body ng-controller="Empresa" style="width: 900px">
+	
+	<canvas id="line" class="chart chart-line" chart-data="data"
+		chart-labels="labels" chart-series="series" chart-options="options"
+		chart-dataset-override="datasetOverride">
+	</canvas>
+	<iframe id="tradingview_b441d" src="https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_b441d&amp;symbol=VVAR3&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=0&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=0&amp;details=0&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=VVAR3" style="width: 100%; height: 100%; margin: 0 !important; padding: 0 !important;" frameborder="0" allowtransparency="true" scrolling="no" allowfullscreen=""></iframe>
+</body>
+</html>
